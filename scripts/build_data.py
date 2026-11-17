@@ -335,7 +335,8 @@ _paren = re.compile(r"[（(].*?[）)]")
 
 
 def norm_name(s: str) -> str:
-    s = unicodedata.normalize("NFKC", s or "").strip().lower()
+    s = unicodedata.normalize("NFKD", s or "")
+    s = "".join(c for c in s if not unicodedata.combining(c)).strip().lower()
     s = s.replace("♀", "-f").replace("♂", "-m")
     s = re.sub(r"[\s\-_.':’]", "", s)
     return s
@@ -411,6 +412,17 @@ FORM_NAME_OVERRIDE = {
     "SPECIES_INDEEDEE_F": "爱管侍（雌性）",
     "SPECIES_BASCULEGION_M": "幽尾玄鱼（雄性）",
     "SPECIES_BASCULEGION_F": "幽尾玄鱼（雌性）",
+    "SPECIES_FLOETTE_ETERNAL": "花叶蒂（永恒之花）",
+    "SPECIES_FLABEBE_RED": "花蓓蓓（红花）",
+    "SPECIES_FLABEBE_YELLOW": "花蓓蓓（黄花）",
+    "SPECIES_FLABEBE_ORANGE": "花蓓蓓（橙花）",
+    "SPECIES_FLABEBE_BLUE": "花蓓蓓（蓝花）",
+    "SPECIES_FLABEBE_WHITE": "花蓓蓓（白花）",
+    "SPECIES_FLOETTE_RED": "花叶蒂（红花）",
+    "SPECIES_FLOETTE_YELLOW": "花叶蒂（黄花）",
+    "SPECIES_FLOETTE_ORANGE": "花叶蒂（橙花）",
+    "SPECIES_FLOETTE_BLUE": "花叶蒂（蓝花）",
+    "SPECIES_FLOETTE_WHITE": "花叶蒂（白花）",
 }
 
 
@@ -448,11 +460,13 @@ def main():
         if r:
             move_zh[constant] = (r["zh"], clean_text(r["desc"]))
     # Shadow Blast is not in the v1.2.1 ROM; use a descriptive translation.
-    move_zh.setdefault("MOVE_DARK_AERO", ("暗影爆破", ""))
+    move_zh.setdefault("MOVE_DARK_AERO", ("暗影爆破", "释放暗影冲击攻击对手。容易击中要害。"))
     ability_zh = {r["constant"]: (r["zh"], clean_text(r["desc"])) for r in rom["abilities"]}
     item_zh_by_id = {r["id"]: (r["zh"], clean_text(r["desc"])) for r in rom["items"]}
 
     # ---- species -------------------------------------------------------
+    zh_desc_by_name = {v["zh"]: v["desc"] for v in zh_pokemon.values() if v.get("zh") and v.get("desc")}
+
     species = []
     for s in species_raw:
         en = s["name"]
@@ -477,7 +491,7 @@ def main():
             "hiddenAbilities": [ability_zh.get(a, (a,))[0] for a in s.get("hiddenAbilities", [])],
             "innates": [ability_zh.get(a, (a,))[0] for a in s.get("innates", [])],
             "sprite": s.get("sprite"),
-            "description": z.get("desc", ""),
+            "description": z.get("desc") or zh_desc_by_name.get(re.sub(r"（.*?）", "", name_zh), "") or "",
             "category": z.get("category", ""),
             "isForm": form_prefix(s["constant"]) is not None,
         })
