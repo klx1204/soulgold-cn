@@ -239,6 +239,33 @@ MAP_ZH = {
     "Bellchime Trail": "铃铛小路",
     "Olivine City Cafe": "浅葱市咖啡厅",
     "Goldenrod Apartment": "满金公寓",
+    "Cianwood": "湛蓝市",
+    "Dewford": "武斗镇",
+    "Dewford Town": "武斗镇",
+    "Dewford Town Gym": "武斗镇道馆",
+    "Safari Zone Gate": "狩猎地带入口",
+    "Lake of Rage House 1": "愤怒之湖民居 1",
+    "Ecruteak City House 3": "圆朱市民居 3",
+    "Goldenrod City Game Corner": "满金市游戏城",
+    "Goldenrod City Burned Tower": "满金市烧焦塔",
+    "Goldenrod City Gym": "满金市道馆",
+    "Ecruteak City Gym": "圆朱市道馆",
+    "Olivine City Gym": "浅葱市道馆",
+    "Blackthorn City Gym": "烟墨市道馆",
+    "Mahogany Town Gym": "卡吉镇道馆",
+    "Azalea Town Gym": "桧皮镇道馆",
+    "Violet City Gym": "桔梗市道馆",
+    "Violet City Sprout Tower": "桔梗市喇叭芽之塔",
+    "Fishing": "钓鱼",
+    "Any fishing spot": "任意钓鱼点",
+    "Bug Catching Contest": "捕虫大赛",
+    "Battle Frontier Battle Factory Lobby": "对战开拓区·对战工厂大厅",
+    "Gate Goldenrod City Route 35": "满金市—35号道路门房",
+    "Ruins of Alph Puzzle And Reward Chambers": "阿露福遗迹谜题与奖励房间",
+    "New Bark Town Lab": "若叶镇研究所",
+    "Route 40 House 5": "40号道路民居 5",
+    "Mahogany Town Shop": "卡吉镇商店",
+    "Kitakami Temple Storage": "北上神殿仓库",
 }
 
 
@@ -266,13 +293,15 @@ def map_name_zh(en: str) -> str:
         n = int(m.group(1))
         return f"{n}号水路" if n in (40, 41) else f"{n}号道路"
     for suffix, zh in (
+        (" Game Corner", "游戏城"),
+        (" Pokemon Center", "宝可梦中心"),
+        (" House", "民居"),
+        (" Gate", "入口"),
         (" Mart", "商店"),
         (" Gym", "道馆"),
         (" Department Store", "百货大楼"),
         (" Lighthouse", "灯塔"),
         (" Underground Switches", "地下开关"),
-        (" City", "市"),
-        (" Town", "镇"),
     ):
         if en.endswith(suffix):
             return map_name_zh(en[: -len(suffix)]) + zh
