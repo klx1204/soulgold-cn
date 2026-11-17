@@ -51,6 +51,7 @@ POCKET_ZH = {
     "POCKET_TM_HM": "技能机", "POCKET_BERRIES": "树果",
     "POCKET_KEY_ITEMS": "重要物品", "POCKET_MAIL": "邮件",
     "POCKET_BATTLE_ITEMS": "战斗道具", "POCKET_MEDICINE": "药品",
+    "POCKET_MEGASTONES": "超级石",
 }
 
 STAT_ZH = {
@@ -208,6 +209,36 @@ MAP_ZH = {
     "Meteor Island": "流星岛",
     "Faraway Island": "遥远小岛",
     "Rinto Village": "林都村",
+    "Sprout Tower": "喇叭芽之塔",
+    "Sprout Tower 1F": "喇叭芽之塔 1F",
+    "National Park Normal": "自然公园（普通）",
+    "Olivine City Port Outside": "浅葱市港口（外部）",
+    "Olivine City Port Inside": "浅葱市港口（内部）",
+    "Snowtop Mountain": "雪顶山",
+    "Faraway Island Jungle": "遥远小岛丛林",
+    "Goldenrod Shore": "满金市海岸",
+    "Goldenrod City Underground Tunnel": "满金市地下通道",
+    "Goldenrod City Underground Storage": "满金市地下仓库",
+    "Ecruteak City Theater": "圆朱市舞厅",
+    "Rocket Hideout B2F": "火箭队基地 B2F",
+    "Rocket Hideout B3F": "火箭队基地 B3F",
+    "Goldenrod City Radio Tower 1F": "满金市广播塔 1F",
+    "Goldenrod City Radio Tower 2F": "满金市广播塔 2F",
+    "Goldenrod City Radio Tower 3F": "满金市广播塔 3F",
+    "Goldenrod City Radio Tower 4F": "满金市广播塔 4F",
+    "Goldenrod City Radio Tower 5F": "满金市广播塔 5F",
+    "Kitakami Temple Battle Room": "北上神殿战斗室",
+    "Kitakami Houses": "北上房屋",
+    "Pokemon League Wills Room": "宝可梦联盟 阿渡房间",
+    "Pokemon League Kogas Room": "宝可梦联盟 阿桔房间",
+    "Pokemon League Brunos Room": "宝可梦联盟 希巴房间",
+    "Pokemon League Karens Room": "宝可梦联盟 卡伦房间",
+    "Pokemon League Champions Room": "宝可梦联盟 冠军房间",
+    "Mt. Silver Summit Day": "白银山山顶（白天）",
+    "Violet City Trainer School": "桔梗市训练家学校",
+    "Bellchime Trail": "铃铛小路",
+    "Olivine City Cafe": "浅葱市咖啡厅",
+    "Goldenrod Apartment": "满金公寓",
 }
 
 
@@ -547,10 +578,16 @@ def main():
                 "timeZh": TIME_ZH.get(v.get("time"), v.get("time")),
                 "methods": methods,
             })
+        map_override = {
+            "MAP_FOGGY_SHORE": "雾岸",
+            "MAP_ROUTE33SOUTH_2": "城都南海（深处）",
+            "MAP_METEOR_CAVE1": "流星岛洞窟 1",
+            "MAP_METEOR_CAVE2": "流星岛洞窟 2",
+        }
         encounters.append({
             "map": m.get("map"),
             "name": m.get("name"),
-            "nameZh": map_name_zh(m.get("name", "")),
+            "nameZh": map_override.get(m.get("map"), map_name_zh(m.get("name", ""))),
             "hasTimeVariants": m.get("hasTimeVariants"),
             "variants": variants,
         })

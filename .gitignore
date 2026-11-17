@@ -4,3 +4,4 @@ dist
 *.log
 measure.mjs
 shot.mjs
+*.tsbuildinfo

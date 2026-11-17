@@ -381,4 +381,4 @@ html.light .chip[data-active="true"] {
   padding: 0.2em 0 0.2em 0.9em;
   color: var(--text-dim);
 }
-.md img { max-width: 100%; border-radius: 10px; }
+.md img { max-width: min(100%, 520px); border-radius: 10px; }

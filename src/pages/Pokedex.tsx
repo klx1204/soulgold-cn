@@ -13,6 +13,7 @@ export default function Pokedex() {
   const [q, setQ] = useState("");
   const [types, setTypes] = useState<string[]>([]);
   const [sort, setSort] = useState<"dex" | "name" | "bst">("dex");
+  const [typeMode, setTypeMode] = useState<"all" | "any">("all");
   const query = useDebounced(q.toLowerCase().replace(/\s+/g, ""), 150);
 
   const rows = useMemo(() => {
@@ -20,7 +21,10 @@ export default function Pokedex() {
     const baseOnly = false;
     const filtered = data.filter((s) => {
       if (baseOnly && s.isForm) return false;
-      if (types.length && !types.every((t) => s.types.includes(t))) return false;
+      if (types.length) {
+        const hit = typeMode === "all" ? types.every((t) => s.types.includes(t)) : types.some((t) => s.types.includes(t));
+        if (!hit) return false;
+      }
       if (!query) return true;
       const hay = `${s.name.toLowerCase()}|${s.nameEn.toLowerCase()}|${s.py ?? ""}|${s.pyi ?? ""}|${s.dex ?? ""}`;
       return hay.includes(query);
@@ -36,7 +40,7 @@ export default function Pokedex() {
     if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name, "zh"));
     if (sort === "bst") sorted.sort((a, b) => b.bst - a.bst);
     return sorted;
-  }, [data, query, types, sort]);
+  }, [data, query, types, sort, typeMode]);
 
   const toggleType = (t: string) => {
     setTypes((old) => {
@@ -74,6 +78,11 @@ export default function Pokedex() {
               {types.includes(t) && <span className="faint">#{types.indexOf(t) + 1}</span>}
             </button>
           ))}
+          {types.length > 1 && (
+            <button className="btn !py-1 !text-xs" onClick={() => setTypeMode(typeMode === "all" ? "any" : "all")}>
+              {typeMode === "all" ? "同时具备" : "任一属性"}
+            </button>
+          )}
           {types.length > 0 && (
             <button className="btn !py-1 !text-xs" onClick={() => setTypes([])}>
               <X size={12} /> 清除
