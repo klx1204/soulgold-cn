@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c1411" />
+    <meta name="description" content="宝可梦 魂金（Soulgold）中文资料站：图鉴、招式、特性、道具、遇敌、技能机、训练家、开拓区与攻略指南。" />
+    <link rel="icon" type="image/png" href="sprites/pokemon/ho_oh.png" />
+    <title>魂金图鉴 · Soulgold 中文资料站</title>
+    <script>
+      try {
+        const t = localStorage.getItem("sg-theme");
+        if (t === "light" || (!t && matchMedia("(prefers-color-scheme: light)").matches)) {
+          document.documentElement.classList.add("light");
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
