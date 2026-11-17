@@ -64,6 +64,34 @@ export default function MoveDetail() {
         {move.description && <p className="mt-4 text-sm leading-7 muted">{move.description}</p>}
       </div>
 
+      <SectionCard title="招式效果" className="mt-4">
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          {move.target && <span className="chip !py-0.5 !cursor-default">目标：{move.target}</span>}
+          {(move.tags ?? []).map((t) => (
+            <span key={t} className="chip !py-0.5 !cursor-default">{t}</span>
+          ))}
+          {move.priority !== 0 && (
+            <span className="chip !py-0.5 !cursor-default">优先度 {move.priority > 0 ? `+${move.priority}` : move.priority}</span>
+          )}
+          {!move.target && (move.tags ?? []).length === 0 && move.priority === 0 && (
+            <span className="text-xs faint">无特殊判定。</span>
+          )}
+        </div>
+        {(move.effects ?? []).length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            <div className="text-[11px] faint">追加效果</div>
+            {(move.effects ?? []).map((e, i) => (
+              <div key={i} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm" style={{ background: "var(--surface-2)" }}>
+                <span className="rounded px-1.5 py-0.5 text-[11px] font-semibold tabular-nums" style={{ background: "color-mix(in srgb, var(--accent) 18%, transparent)", color: "var(--accent)" }}>
+                  {e.chance}%
+                </span>
+                <span>{e.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </SectionCard>
+
       <SectionCard title={`可学会的宝可梦${learners ? `（${learners.length}）` : ""}`} className="mt-4">
         {!learners && <Loading lines={4} />}
         {learners && learners.length === 0 && <Empty>暂无学习数据</Empty>}

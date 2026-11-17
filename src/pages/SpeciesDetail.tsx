@@ -34,9 +34,11 @@ const EFF: Record<string, Record<string, number>> = {
 
 interface LearnMove extends Move {
   kind: string;
+  level?: number | null;
 }
 
-type LearnMap = Record<string, Record<string, string[]>>;
+type LearnItem = string | { slug: string; level: number | null };
+type LearnMap = Record<string, Record<string, LearnItem[]>>;
 
 function effectiveness(types: string[]) {
   const result: Record<string, number> = {};
@@ -53,12 +55,12 @@ export default function SpeciesDetail() {
   const { data } = useData<Species[]>("species");
   const { data: moves } = useData<Move[]>("moves");
   const { data: learnMap } = useData<LearnMap>("species-moves");
-  const [filter, setFilter] = useState<string>("全部");
+  const [filter, setFilter] = useState<string>("升级");
 
   const species = data?.find((s) => s.slug === slug);
 
   useEffect(() => {
-    setFilter("全部");
+    setFilter("升级");
   }, [slug]);
 
   const learn = useMemo<LearnMove[] | null>(() => {
@@ -67,11 +69,22 @@ export default function SpeciesDetail() {
     const bySlug = new Map(moves.map((m) => [m.slug, m]));
     const rows: LearnMove[] = [];
     for (const [kind, list] of Object.entries(groups)) {
-      for (const ms of list) {
+      for (const item of list) {
+        const ms = typeof item === "string" ? item : item.slug;
+        const level = typeof item === "string" ? null : item.level;
         const m = bySlug.get(ms);
-        if (m) rows.push({ ...m, kind });
+        if (m) rows.push({ ...m, kind, level });
       }
     }
+    rows.sort((a, b) => {
+      if (a.kind !== b.kind) return 0;
+      if (a.kind === "升级") {
+        const la = a.level ?? 999;
+        const lb = b.level ?? 999;
+        if (la !== lb) return la - lb;
+      }
+      return a.name.localeCompare(b.name, "zh");
+    });
     return rows;
   }, [learnMap, moves, slug]);
 
@@ -85,6 +98,12 @@ export default function SpeciesDetail() {
     if (filter === "全部") return learn;
     return learn.filter((m) => m.kind === filter);
   }, [learn, filter]);
+
+  const learnCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const m of learn ?? []) counts[m.kind] = (counts[m.kind] ?? 0) + 1;
+    return counts;
+  }, [learn]);
 
   if (!data) {
     return (
@@ -211,9 +230,12 @@ export default function SpeciesDetail() {
 
       <SectionCard title="可学会的招式" className="mt-4" right={
         <div className="flex flex-wrap gap-1">
-          {["全部", "升级", "技能机", "教学", "遗传"].map((k) => (
+          {["升级", "技能机", "教学", "遗传", "全部"].map((k) => (
             <button key={k} className="chip !py-0.5 !px-2 !text-[11px]" data-active={filter === k} onClick={() => setFilter(k)}>
               {k}
+              <span className="faint">
+                {k === "全部" ? (learn ? learn.length : 0) : (learnCounts[k] ?? 0)}
+              </span>
             </button>
           ))}
         </div>
@@ -226,12 +248,13 @@ export default function SpeciesDetail() {
               <thead>
                 <tr className="text-left text-xs faint">
                   <th className="py-1.5 pr-2 font-normal">招式</th>
+                  <th className="py-1.5 pr-2 font-normal text-right">等级</th>
                   <th className="py-1.5 pr-2 font-normal">属性</th>
-                  <th className="py-1.5 pr-2 font-normal">分类</th>
+                  <th className="hidden sm:table-cell py-1.5 pr-2 font-normal">分类</th>
                   <th className="py-1.5 pr-2 font-normal text-right">威力</th>
-                  <th className="py-1.5 pr-2 font-normal text-right">命中</th>
-                  <th className="py-1.5 pr-2 font-normal text-right">PP</th>
-                  <th className="py-1.5 font-normal">方式</th>
+                  <th className="hidden sm:table-cell py-1.5 pr-2 font-normal text-right">命中</th>
+                  <th className="hidden sm:table-cell py-1.5 pr-2 font-normal text-right">PP</th>
+                  <th className="hidden sm:table-cell py-1.5 font-normal">方式</th>
                 </tr>
               </thead>
               <tbody>
@@ -240,12 +263,15 @@ export default function SpeciesDetail() {
                     <td className="py-1.5 pr-2">
                       <Link to={`/moves/${m.slug}`} className="hover:underline" style={{ color: "var(--accent)" }}>{m.name}</Link>
                     </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums text-xs faint">
+                      {m.kind === "升级" ? (m.level ?? "—") : "—"}
+                    </td>
                     <td className="py-1.5 pr-2"><TypeBadge type={m.type} /></td>
-                    <td className="py-1.5 pr-2 text-xs muted">{m.category}</td>
+                    <td className="hidden sm:table-cell py-1.5 pr-2 text-xs muted">{m.category}</td>
                     <td className="py-1.5 pr-2 text-right tabular-nums">{m.power || "—"}</td>
-                    <td className="py-1.5 pr-2 text-right tabular-nums">{m.accuracy || "—"}</td>
-                    <td className="py-1.5 pr-2 text-right tabular-nums">{m.pp}</td>
-                    <td className="py-1.5 text-xs faint">{m.kind}</td>
+                    <td className="hidden sm:table-cell py-1.5 pr-2 text-right tabular-nums">{m.accuracy || "—"}</td>
+                    <td className="hidden sm:table-cell py-1.5 pr-2 text-right tabular-nums">{m.pp}</td>
+                    <td className="hidden sm:table-cell py-1.5 text-xs faint">{m.kind}</td>
                   </tr>
                 ))}
               </tbody>

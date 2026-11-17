@@ -329,6 +329,171 @@ def source_zh(s: str) -> str:
     return LOCATION_SOURCE_ZH.get(s or "", s or "")
 
 
+# Move effect constants -> Chinese wording. Unknown ones fall back to the raw
+# constant so a newly added effect is still visible instead of silently lost.
+MOVE_EFFECT_ZH = {
+    "MOVE_EFFECT_SLEEP": "使对手睡眠",
+    "MOVE_EFFECT_POISON": "使对手中毒",
+    "MOVE_EFFECT_BURN": "使对手灼伤",
+    "MOVE_EFFECT_FREEZE": "使对手冰冻",
+    "MOVE_EFFECT_FREEZE_OR_FROSTBITE": "使对手冰冻或冻伤",
+    "MOVE_EFFECT_FROSTBITE": "使对手冻伤",
+    "MOVE_EFFECT_PARALYSIS": "使对手麻痹",
+    "MOVE_EFFECT_TOXIC": "使对手陷入剧毒",
+    "MOVE_EFFECT_CONFUSION": "使对手混乱",
+    "MOVE_EFFECT_FLINCH": "使对手畏缩",
+    "MOVE_EFFECT_INFATUATE": "使对手着迷",
+    "MOVE_EFFECT_INFATUATE_SIDE": "使对方全体着迷",
+    "MOVE_EFFECT_NIGHTMARE": "使对手陷入恶梦",
+    "MOVE_EFFECT_LEECH_SEED": "种下寄生种子",
+    "MOVE_EFFECT_WRAP": "束缚对手 4～5 回合",
+    "MOVE_EFFECT_TRAP_BOTH": "束缚对方全体",
+    "MOVE_EFFECT_PREVENT_ESCAPE": "使对手无法逃走",
+    "MOVE_EFFECT_PREVENT_ESCAPE_SIDE": "使对方全体无法逃走",
+    "MOVE_EFFECT_RECHARGE": "使用后下一回合无法行动",
+    "MOVE_EFFECT_RECOIL_HP_25": "承受造成伤害 1/4 的反作用力",
+    "MOVE_EFFECT_REMOVE_STATUS": "治愈对手的异常状态",
+    "MOVE_EFFECT_AROMATHERAPY": "治愈我方全体的异常状态",
+    "MOVE_EFFECT_HEAL_TEAM": "回复我方全体的 HP",
+    "MOVE_EFFECT_FLORAL_HEALING": "回复对手 HP",
+    "MOVE_EFFECT_PAYDAY": "战斗后获得金钱",
+    "MOVE_EFFECT_HAPPY_HOUR": "战斗后获得双倍金钱",
+    "MOVE_EFFECT_THRASH": "连续攻击 2～3 回合后混乱",
+    "MOVE_EFFECT_UPROAR": "连续攻击 2～3 回合，期间对手无法睡眠",
+    "MOVE_EFFECT_FEINT": "使守住等保护招式失效",
+    "MOVE_EFFECT_HAPPY_HOUR": "战斗后获得双倍金钱",
+    "MOVE_EFFECT_CLEAR_SMOG": "清除对手的能力提升",
+    "MOVE_EFFECT_FLAME_BURST": "使周围对手受到伤害",
+    "MOVE_EFFECT_V_CREATE": "降低自身防御、特防与速度",
+    "MOVE_EFFECT_SCALE_SHOT": "自身速度提升、防御下降",
+    "MOVE_EFFECT_THROAT_CHOP": "使对手无法使用声音招式",
+    "MOVE_EFFECT_INCINERATE": "烧毁对手携带的树果",
+    "MOVE_EFFECT_BUG_BITE": "夺取并食用对手携带的树果",
+    "MOVE_EFFECT_CORE_ENFORCER": "使对手的特性失效",
+    "MOVE_EFFECT_SYRUP_BOMB": "3 回合内持续降低对手速度",
+    "MOVE_EFFECT_ORDER_UP": "根据已倒下的同伴提升能力",
+    "MOVE_EFFECT_TERA_BLAST": "根据太晶属性改变招式属性",
+    "MOVE_EFFECT_GLAIVE_RUSH": "使对手无法闪避，自身也必定被击中",
+    "MOVE_EFFECT_THRASH": "连续攻击 2～3 回合后混乱",
+    "MOVE_EFFECT_TRI_ATTACK": "有概率使对手灼伤、冰冻或麻痹",
+    "MOVE_EFFECT_PSYCHIC_NOISE": "使对手无法回复 HP",
+    "MOVE_EFFECT_EERIE_SPELL": "降低对手 PP",
+    "MOVE_EFFECT_SPITE": "降低对手最后使用招式的 PP",
+    "MOVE_EFFECT_YAWN_FOE": "使对手在下一回合睡眠",
+    "MOVE_EFFECT_ION_DELUGE": "使一般属性招式变为电属性",
+    "MOVE_EFFECT_SALT_CURE": "使对手陷入盐腌状态",
+    "MOVE_EFFECT_DIRE_CLAW": "容易击中要害",
+    "MOVE_EFFECT_STEELSURGE": "在对手场地撒下锐利钢刺",
+    "MOVE_EFFECT_STEALTH_ROCK": "在对手场地撒下隐形岩",
+    "MOVE_EFFECT_HAPPY_HOUR": "战斗后获得双倍金钱",
+    "MOVE_EFFECT_HAZE": "清除双方的能力变化",
+    "MOVE_EFFECT_DEFOG": "清除场地上的雾与光墙等",
+    "MOVE_EFFECT_REFLECT": "5 回合内降低物理伤害",
+    "MOVE_EFFECT_LIGHT_SCREEN": "5 回合内降低特殊伤害",
+    "MOVE_EFFECT_AURORA_VEIL": "5 回合内降低物理与特殊伤害",
+    "MOVE_EFFECT_SUN": "使天气变为晴朗",
+    "MOVE_EFFECT_RAIN": "使天气变为下雨",
+    "MOVE_EFFECT_SANDSTORM": "使天气变为沙暴",
+    "MOVE_EFFECT_HAIL": "使天气变为冰雹",
+    "MOVE_EFFECT_MISTY_TERRAIN": "展开薄雾场地",
+    "MOVE_EFFECT_GRASSY_TERRAIN": "展开青草场地",
+    "MOVE_EFFECT_ELECTRIC_TERRAIN": "展开电气场地",
+    "MOVE_EFFECT_PSYCHIC_TERRAIN": "展开精神场地",
+    "MOVE_EFFECT_GRAVITY": "5 回合内处于重力状态",
+    "MOVE_EFFECT_RECYCLE_BERRIES": "回收已使用的树果",
+    "MOVE_EFFECT_STEAL_STATS": "夺取对手的能力提升",
+    "MOVE_EFFECT_BREAK_SCREEN": "破坏光墙与反射壁",
+    "MOVE_EFFECT_FIXED_POWER": "造成固定数值的伤害",
+    "MOVE_EFFECT_REMOVE_ARG_TYPE": "移除对手的属性",
+    "MOVE_EFFECT_ALL_STATS_UP": "提升自身全部能力",
+    "MOVE_EFFECT_ATK_DEF_DOWN": "降低自身攻击与防御",
+    "MOVE_EFFECT_DEF_SPDEF_DOWN": "降低自身防御与特防",
+    "MOVE_EFFECT_POISON_SIDE": "使对方全体中毒",
+    "MOVE_EFFECT_PARALYZE_SIDE": "使对方全体麻痹",
+    "MOVE_EFFECT_POISON_PARALYZE_SIDE": "使对方全体中毒或麻痹",
+    "MOVE_EFFECT_CONFUSE_SIDE": "使对方全体混乱",
+    "MOVE_EFFECT_CONFUSE_PAY_DAY_SIDE": "使对方全体混乱并获得金钱",
+    "MOVE_EFFECT_CRIT_PLUS_SIDE": "提升我方全体的击中要害率",
+    "MOVE_EFFECT_EFFECT_SPORE_SIDE": "使对方全体陷入随机异常状态",
+    "MOVE_EFFECT_SANDBLAST_SIDE": "降低对方全体命中率",
+    "MOVE_EFFECT_LOWER_ATTACK_SIDE": "降低对方全体攻击",
+    "MOVE_EFFECT_LOWER_DEFENSE_SIDE": "降低对方全体防御",
+    "MOVE_EFFECT_LOWER_SPEED_SIDE": "降低对方全体速度",
+    "MOVE_EFFECT_LOWER_SPEED_2_SIDE": "大幅降低对方全体速度",
+    "MOVE_EFFECT_LOWER_SP_ATK_SIDE": "降低对方全体特攻",
+    "MOVE_EFFECT_LOWER_SP_DEF_SIDE": "降低对方全体特防",
+    "MOVE_EFFECT_LOWER_EVASIVENESS_SIDE": "降低对方全体闪避率",
+    "MOVE_EFFECT_FIRE_SPIN_SIDE": "束缚对方全体 4～5 回合",
+    "MOVE_EFFECT_TORMENT_SIDE": "使对方全体无法连续使用同一招式",
+    "MOVE_EFFECT_RAISE_TEAM_ATTACK": "提升我方全体攻击",
+    "MOVE_EFFECT_RAISE_TEAM_DEFENSE": "提升我方全体防御",
+    "MOVE_EFFECT_RAISE_TEAM_SPEED": "提升我方全体速度",
+    "MOVE_EFFECT_RAISE_TEAM_SP_ATK": "提升我方全体特攻",
+    "MOVE_EFFECT_RAISE_TEAM_SP_DEF": "提升我方全体特防",
+    "MOVE_EFFECT_CANNONADE": "连续攻击 2～5 次",
+    "MOVE_EFFECT_VINE_LASH": "设置藤蔓陷阱",
+    "MOVE_EFFECT_WILDFIRE": "使场地燃起火焰",
+    "MOVE_EFFECT_VOLCALITH": "在对手场地散布火山灰",
+    "MOVE_EFFECT_SECRET_POWER": "根据地形追加效果",
+    "MOVE_EFFECT_ROUND": "同伴使用轮唱时威力提升",
+    "MOVE_EFFECT_BEAT_UP_MESSAGE": "同伴越多威力越高",
+}
+
+STAT_ZH = {
+    "ATK": "攻击", "DEF": "防御", "SPD": "速度",
+    "SP_ATK": "特攻", "SP_DEF": "特防", "ACC": "命中率", "EVS": "闪避率",
+}
+
+TARGET_ZH = {
+    "TARGET_SELECTED": "单体",
+    "TARGET_BOTH": "对方全体",
+    "TARGET_USER": "自身",
+    "TARGET_ALLY": "我方单体",
+    "TARGET_SELECTED_ALLY": "我方单体",
+    "TARGET_ALL_ADJACENT": "周围全体",
+    "TARGET_ALL_ADJACENT_OPPONENTS": "对方周围全体",
+    "TARGET_OPPONENTS_FIELD": "对方场地",
+    "TARGET_USER_FIELD": "我方场地",
+    "TARGET_ALL": "全场",
+    "TARGET_RANDOM": "随机目标",
+    "TARGET_ATTACKER": "攻击者",
+}
+
+MOVE_FLAG_ZH = {
+    "makesContact": "接触",
+    "ignoresProtect": "无视守护",
+    "magicCoatAffected": "可被魔法反射",
+    "snatchAffected": "可被抢夺",
+    "soundMove": "声音",
+    "punchingMove": "拳类",
+    "bitingMove": "咬类",
+    "pulseMove": "波动",
+    "ballisticMove": "弹类",
+    "powderMove": "粉末",
+    "danceMove": "舞蹈",
+    "windMove": "风类",
+    "slicingMove": "切类",
+    "healingMove": "回复",
+    "minimizeDoubleDamage": "对变小目标威力翻倍",
+}
+
+
+def effect_text(code: str) -> str:
+    if code in MOVE_EFFECT_ZH:
+        return MOVE_EFFECT_ZH[code]
+    body = code.replace("MOVE_EFFECT_", "")
+    body = body.replace("_SIDE", "")
+    m = re.match(r"(ATK|DEF|SPD|SP_ATK|SP_DEF|ACC|EVS)_(PLUS|MINUS)_(\d)", body)
+    if m:
+        stat = STAT_ZH[m.group(1)]
+        verb = "提升" if m.group(2) == "PLUS" else "降低"
+        return f"{verb}自身{stat}{m.group(3)}级"
+    for k, v in STAT_ZH.items():
+        if body == f"{k}_PLUS_1":
+            return f"提升自身{v}1级"
+    return code
+
+
 # ------------------------------------------------------------------ utilities
 
 _paren = re.compile(r"[（(].*?[）)]")
@@ -436,6 +601,63 @@ def display_species_name(constant: str, en: str, zh_base: str) -> str:
     return f"{prefix}{zh_base}{tail}"
 
 
+def parse_level_ups():
+    """Return (learnset symbol -> [(level, move)], SPECIES_ -> symbol)."""
+    pat = re.compile(
+        r"static\s+const\s+struct\s+LevelUpMove\s+(s\w+LevelUpLearnset)\[\]\s*=\s*\{(.*?)\};",
+        re.S,
+    )
+    sets = {}
+    for f in [SOUL / "src/data/pokemon/level_up_learnsets/gen_9.h",
+              SOUL / "src/data/pokemon/level_up_learnsets/generated_legacy_level_up_learnsets.h"]:
+        if not f.exists():
+            continue
+        for sym, body in pat.findall(f.read_text(encoding="utf-8", errors="replace")):
+            sets[sym] = [
+                (int(level), move)
+                for level, move in re.findall(
+                    r"LEVEL_UP_MOVE\(\s*(\d+)\s*,\s*(MOVE_[A-Z0-9_]+)\s*\)", body
+                )
+            ]
+    blocks = {}
+    for f in sorted((SOUL / "src/data/pokemon/species_info").glob("*.h")):
+        text = f.read_text(encoding="utf-8", errors="replace")
+        parts = re.split(r"\n\s*\[(SPECIES_[A-Z0-9_]+)\]\s*=", text)
+        for i in range(1, len(parts) - 1, 2):
+            m = re.search(r"\.levelUpLearnset\s*=\s*(s\w+LevelUpLearnset)", parts[i + 1])
+            if m:
+                blocks[parts[i]] = m.group(1)
+    return sets, blocks
+
+
+def parse_move_meta():
+    """Parse move flags, target and additional effects from moves_info.h."""
+    text = (SOUL / "src/data/moves_info.h").read_text(encoding="utf-8", errors="replace")
+    parts = re.split(r"\n\s*\[(MOVE_[A-Z0-9_]+)\]\s*=\s*\n?\s*\{", text)
+    out = {}
+    for i in range(1, len(parts) - 1, 2):
+        const, body = parts[i], parts[i + 1]
+        target = re.search(r"\.target\s*=\s*(TARGET_[A-Z0-9_]+)", body)
+        tags = [zh for flag, zh in MOVE_FLAG_ZH.items() if re.search(rf"\.{flag}\s*=\s*TRUE", body)]
+        effects = []
+        for block in re.findall(r"ADDITIONAL_EFFECTS\(\{(.*?)\n\s*\}\)", body, re.S):
+            for chunk in re.split(r"\.moveEffect\s*=\s*", block)[1:]:
+                code = re.match(r"(MOVE_EFFECT_[A-Z0-9_]+)", chunk)
+                if not code:
+                    continue
+                chance = re.search(r"\.chance\s*=\s*(\d+)", chunk)
+                effects.append({
+                    "code": code.group(1),
+                    "chance": int(chance.group(1)) if chance else 100,
+                })
+        out[const] = {
+            "target": TARGET_ZH.get(target.group(1), target.group(1)) if target else "单体",
+            "tags": tags,
+            "effects": effects,
+        }
+    return out
+
+
 def main():
     rom = load_rom_zh()
     zh_pokemon = load_zh_pokemon()
@@ -497,6 +719,7 @@ def main():
         })
 
     # ---- moves ---------------------------------------------------------
+    move_meta = parse_move_meta()
     moves = []
     for constant, m in moves_raw.items():
         zh, desc = move_zh.get(constant, (m["name"], ""))
@@ -516,6 +739,12 @@ def main():
             "pp": m.get("pp") or 0,
             "priority": m.get("priority") or 0,
             "description": desc,
+            "target": (move_meta.get(constant) or {}).get("target", ""),
+            "tags": (move_meta.get(constant) or {}).get("tags", []),
+            "effects": [
+                {"text": effect_text(e["code"]), "chance": e["chance"]}
+                for e in (move_meta.get(constant) or {}).get("effects", [])
+            ],
         })
     moves.sort(key=lambda x: x["nameEn"])
 
@@ -742,8 +971,14 @@ def main():
         })
 
     # ---- per-move learners & per-species learnsets --------------------
-    LEARN_KIND_ZH = {"levelUp": "升级", "eggMoves": "遗传", "tutorMoves": "教学", "tmMoves": "技能机"}
+    LEARN_KIND_ZH = {
+        "levelUp": "升级", "eggMoves": "遗传",
+        "tutors": "教学", "tmhm": "技能机",
+        "tutorMoves": "教学", "tmMoves": "技能机",
+    }
     move_by_slug = {x["slug"]: x for x in moves}
+    level_sets, learnset_symbol = parse_level_ups()
+    move_slug_by_const = {x["constant"]: x["slug"] for x in moves}
     learners_dir = DATA / "move-learners"
     learners_out: dict[str, list] = {}
     species_moves: dict[str, list] = {}
@@ -774,9 +1009,23 @@ def main():
         sp = species_by_const.get(c)
         if not sp:
             continue
-        species_moves_out[sp["slug"]] = {
-            k: sorted(groups[k]) for k in order if k in groups
-        }
+        out_groups: dict[str, list] = {}
+        # level-up moves get an explicit level from the source learnset
+        sym = learnset_symbol.get(c)
+        leveled = []
+        if sym:
+            for level, move_const in level_sets.get(sym, []):
+                slug = move_slug_by_const.get(move_const)
+                if slug:
+                    leveled.append({"slug": slug, "level": level})
+        if not leveled and "升级" in groups:
+            leveled = [{"slug": slug, "level": None} for slug in groups["升级"]]
+        if leveled:
+            out_groups["升级"] = sorted(leveled, key=lambda r: (r["level"] is None, r["level"] or 0, r["slug"]))
+        for k in ("技能机", "教学", "遗传"):
+            if k in groups:
+                out_groups[k] = sorted(groups[k])
+        species_moves_out[sp["slug"]] = out_groups
     (OUT / "learners.json").write_text(
         json.dumps(learners_out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
     )

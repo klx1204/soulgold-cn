@@ -37,6 +37,9 @@ export interface Move extends Searchable {
   pp: number;
   priority: number;
   description: string;
+  target?: string;
+  tags?: string[];
+  effects?: { text: string; chance: number }[];
 }
 
 export interface Ability extends Searchable {

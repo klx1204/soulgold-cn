@@ -9,6 +9,18 @@ import { PageHeader } from "../components/Layout";
 const TYPES = ["一般", "火", "水", "草", "电", "冰", "格斗", "毒", "地面", "飞行", "超能力", "虫", "岩石", "幽灵", "龙", "恶", "钢", "妖精"];
 const CATS = ["物理", "特殊", "变化"];
 
+function shortEffect(m: Move): string {
+  const eff = m.effects ?? [];
+  if (eff.length) {
+    return eff
+      .map((e) => `${e.chance === 100 ? "" : `${e.chance}% `}${e.text.replace(/^使(对手|对方全体)/, "").replace(/^使/, "")}`)
+      .join(" / ");
+  }
+  const tags = (m.tags ?? []).filter((t) => !["可被魔法反射"].includes(t));
+  if (tags.length) return tags.slice(0, 3).join("·");
+  return "";
+}
+
 export default function Moves() {
   const { data } = useData<Move[]>("moves");
   const [q, setQ] = useState("");
@@ -67,6 +79,7 @@ export default function Moves() {
                 <th className="px-3 py-2 font-normal text-right">命中</th>
                 <th className="px-3 py-2 font-normal text-right">PP</th>
                 <th className="px-3 py-2 font-normal text-right">优先</th>
+                <th className="px-3 py-2 font-normal">效果</th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +95,7 @@ export default function Moves() {
                   <td className="px-3 py-2 text-right tabular-nums">{m.accuracy || "—"}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{m.pp}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{m.priority || "—"}</td>
+                  <td className="px-3 py-2 text-[11px] faint max-w-[220px] truncate">{shortEffect(m) || "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -100,6 +114,7 @@ export default function Moves() {
                 <div className="text-right text-[11px] faint tabular-nums">
                   <div>{m.category}</div>
                   <div>威力 {m.power || "—"} · PP {m.pp}</div>
+                  {shortEffect(m) && <div className="max-w-[120px] truncate">{shortEffect(m)}</div>}
                 </div>
               </Link>
             ))}
