@@ -5,3 +5,5 @@ dist
 measure.mjs
 shot.mjs
 *.tsbuildinfo
+__pycache__/
+*.pyc
