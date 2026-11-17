@@ -259,7 +259,7 @@ export default function SpeciesDetail() {
                       <Link to={`/moves/${m.slug}`} className="hover:underline" style={{ color: "var(--accent)" }}>{m.name}</Link>
                     </td>
                     <td className="py-1.5 pr-2 text-right tabular-nums text-xs faint">
-                      {m.kind === "升级" ? (m.level ?? "—") : "—"}
+                      {m.kind === "升级" ? (m.level === 0 ? "进化" : (m.level ?? "—")) : "—"}
                     </td>
                     <td className="py-1.5 pr-2"><TypeBadge type={m.type} /></td>
                     <td className="hidden sm:table-cell py-1.5 pr-2 text-xs muted">{m.category}</td>
