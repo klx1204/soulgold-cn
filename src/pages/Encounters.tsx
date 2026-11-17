@@ -1,10 +1,17 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import { Droplets, Fish, MapPin, Mountain, Sprout } from "lucide-react";
 import { useData } from "../lib/data";
 import type { Encounter } from "../lib/types";
 import { Empty, Loading, PokeSprite, TypeBadge, useDebounced } from "../components/ui";
 import { PageHeader } from "../components/Layout";
+
+const METHOD_META: Record<string, { label: string; icon: typeof Sprout; className: string }> = {
+  land_mons: { label: "草丛", icon: Sprout, className: "text-[#8fce9f]" },
+  water_mons: { label: "冲浪", icon: Droplets, className: "text-[#7fa6d8]" },
+  fishing_mons: { label: "钓鱼", icon: Fish, className: "text-[#e4c07a]" },
+  rock_smash_mons: { label: "碎岩", icon: Mountain, className: "text-[#c9a27a]" },
+};
 
 export default function Encounters() {
   const { data } = useData<Encounter[]>("encounters");
@@ -44,7 +51,13 @@ export default function Encounters() {
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((e) => {
             const speciesSet = new Set<string>();
-            e.variants.forEach((v) => v.methods.forEach((m) => m.mons.forEach((p) => speciesSet.add(p.slug ?? p.name))));
+            const methods = new Set<string>();
+            e.variants.forEach((v) =>
+              v.methods.forEach((m) => {
+                methods.add(m.key);
+                m.mons.forEach((p) => speciesSet.add(p.slug ?? p.name));
+              })
+            );
             const preview = e.variants[0]?.methods.find((m) => m.key === "land_mons")?.mons.slice(0, 6) ??
               e.variants[0]?.methods[0]?.mons.slice(0, 6) ?? [];
             return (
@@ -55,6 +68,19 @@ export default function Encounters() {
                   <span className="ml-auto text-[11px] faint">{speciesSet.size} 种</span>
                 </div>
                 <div className="text-[11px] faint">{e.name}</div>
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {[...methods].map((key) => {
+                    const meta = METHOD_META[key];
+                    if (!meta) return null;
+                    const Icon = meta.icon;
+                    return (
+                      <span key={key} className="flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px]" style={{ background: "var(--surface-2)" }}>
+                        <Icon size={11} className={meta.className} />
+                        {meta.label}
+                      </span>
+                    );
+                  })}
+                </div>
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {preview.map((p) => (
                     <span key={p.constant} className="flex items-center gap-0.5 rounded px-1" style={{ background: "var(--surface-2)" }}>

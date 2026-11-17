@@ -94,7 +94,13 @@ def main():
     trainers = []
     for row in trainers_raw:
         idx = opp_ids.get(row["constant"])
-        name = decode(d, TRAINERS_BASE + TRAINERS_STEP * idx, 12) if idx is not None else ""
+        name = ""
+        if idx is not None:
+            off = TRAINERS_BASE + TRAINERS_STEP * idx
+            # 0xFD introduces a dynamic name placeholder such as {RIVAL};
+            # it has no fixed Chinese text, so leave it empty.
+            if d[off:off + 2] != b"\xfd\x06":
+                name = decode(d, off, 12)
         trainers.append({"constant": row["constant"], "en": row["displayName"], "zh": name})
 
     result = {"species": species, "moves": moves, "abilities": abilities, "items": items, "trainers": trainers}

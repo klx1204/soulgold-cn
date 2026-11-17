@@ -14,7 +14,7 @@ export interface Species extends Searchable {
   typesRaw: string[];
   stats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
   bst: number;
-  abilities: { constant: string; name: string }[];
+  abilities: { constant: string; name: string; hidden?: boolean }[];
   hiddenAbilities: string[];
   innates: string[];
   sprite: string;

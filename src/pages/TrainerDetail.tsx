@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useData } from "../lib/data";
 import type { Trainer } from "../lib/types";
 import { Breadcrumb } from "../components/Layout";
@@ -10,8 +10,12 @@ const STAT: [string, string][] = [
 
 export default function TrainerDetail() {
   const { constant = "" } = useParams();
+  const [params, setParams] = useSearchParams();
   const { data } = useData<Trainer[]>("trainers");
-  const t = data?.find((x) => x.constant === constant);
+
+  const versions = (data ?? []).filter((x) => x.constant === constant);
+  const wanted = params.get("diff");
+  const t = versions.find((x) => x.difficultyRaw === wanted) ?? versions[0];
 
   if (!data) return <div className="page"><Loading lines={5} /></div>;
   if (!t) return <div className="page"><Empty>没有这位训练家</Empty></div>;
@@ -25,7 +29,7 @@ export default function TrainerDetail() {
           <PokeSprite src={t.sprite} alt={t.name} size={72} />
           <div>
             <h1 className="text-2xl font-extrabold">{t.name}</h1>
-            <div className="text-sm faint">{t.constant}</div>
+            <div className="text-sm faint">{t.nameEn}</div>
             <div className="mt-1 flex flex-wrap gap-1.5 text-[11px]">
               <span className="chip !py-0.5 !cursor-default">{t.difficulty}</span>
               <span className="chip !py-0.5 !cursor-default">平均 Lv.{t.avgLevel}</span>
@@ -33,6 +37,21 @@ export default function TrainerDetail() {
             </div>
           </div>
         </div>
+        {versions.length > 1 && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs faint">难度</span>
+            {versions.map((v) => (
+              <button
+                key={v.difficultyRaw}
+                className="chip !py-1 !text-xs"
+                data-active={v.difficultyRaw === t.difficultyRaw}
+                onClick={() => setParams({ diff: v.difficultyRaw })}
+              >
+                {v.difficulty} · 平均 Lv.{v.avgLevel}
+              </button>
+            ))}
+          </div>
+        )}
         {t.locations.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {t.locations.map((l) => (

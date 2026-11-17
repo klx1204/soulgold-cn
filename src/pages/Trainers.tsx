@@ -39,7 +39,11 @@ export default function Trainers() {
         {data && rows.length === 0 && <Empty />}
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((t) => (
-            <Link key={t.constant} to={`/trainers/${t.constant}`} className="card p-3 transition-transform hover:-translate-y-0.5">
+            <Link
+              key={`${t.constant}-${t.difficultyRaw}`}
+              to={`/trainers/${t.constant}?diff=${encodeURIComponent(t.difficultyRaw)}`}
+              className="card p-3 transition-transform hover:-translate-y-0.5"
+            >
               <div className="flex items-center gap-3">
                 <PokeSprite src={t.sprite} alt={t.name} size={44} />
                 <div className="min-w-0">

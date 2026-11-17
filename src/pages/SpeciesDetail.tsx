@@ -173,17 +173,12 @@ export default function SpeciesDetail() {
 
         <SectionCard title="特性">
           <div className="space-y-2">
-            {species.abilities.map((a, i) => (
+            {species.abilities.map((a) => (
               <div key={a.constant} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5" style={{ background: "var(--surface-2)" }}>
                 <span className="text-sm">{a.name}</span>
-                <span className="text-[11px] faint">{i < 2 ? "普通特性" : "特性"}</span>
+                <span className="text-[11px] faint">{a.hidden ? "隐藏特性" : "普通特性"}</span>
               </div>
             ))}
-            {species.hiddenAbilities.length > 0 && (
-              <div className="pt-1 text-xs muted">
-                隐藏特性：{species.hiddenAbilities.join("、")}
-              </div>
-            )}
             {species.innates.length > 0 && (
               <div className="text-xs muted flex items-center gap-1">
                 <Sparkles size={12} /> 先天特性：{species.innates.join("、")}

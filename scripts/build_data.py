@@ -630,6 +630,46 @@ def parse_level_ups():
     return sets, blocks
 
 
+def parse_item_meta():
+    """ITEM_ constant -> English name, pocket, icon file."""
+    text = (SOUL / "src/data/items.h").read_text(encoding="utf-8", errors="replace")
+    parts = re.split(r"\n\s*\[(ITEM_[A-Z0-9_]+)\]\s*=\s*\n?\s*\{", text)
+    graphics = (SOUL / "src/data/graphics/items.h").read_text(encoding="utf-8", errors="replace")
+    icon_map = dict(re.findall(
+        r'const\s+u32\s+(gItemIcon_\w+)\[\]\s*=\s*INCBIN_U32\("([^"]+)\.4bpp\.smol"\)',
+        graphics,
+    ))
+    out = {}
+    for i in range(1, len(parts) - 1, 2):
+        const, body = parts[i], parts[i + 1]
+        name = re.search(r'\.name\s*=\s*(?:ITEM_NAME|ITEM_PLURAL_NAME|COMPOUND_STRING)\("([^"]*)"\)', body)
+        if not name:
+            continue
+        pocket = re.search(r"\.pocket\s*=\s*(POCKET_\w+)", body)
+        icon = re.search(r"\.iconPic\s*=\s*(gItemIcon_\w+)", body)
+        icon_path = icon_map.get(icon.group(1)) if icon else None
+        out[const] = {
+            "en": name.group(1),
+            "pocket": pocket.group(1) if pocket else "POCKET_ITEMS",
+            "icon": f"{icon_path}.png" if icon_path else None,
+        }
+    return out
+
+
+def parse_item_ids():
+    """ITEM_ constant -> enum value."""
+    text = (SOUL / "include/constants/items.h").read_text(encoding="utf-8", errors="replace")
+    current = -1
+    ids = {}
+    for line in text.splitlines():
+        m = re.match(r"\s*(ITEM_[A-Z0-9_]+)\s*(?:=\s*(\d+))?\s*,", line)
+        if not m:
+            continue
+        current = int(m.group(2)) if m.group(2) else current + 1
+        ids[m.group(1)] = current
+    return ids
+
+
 def parse_move_meta():
     """Parse move flags, target and additional effects from moves_info.h."""
     text = (SOUL / "src/data/moves_info.h").read_text(encoding="utf-8", errors="replace")
@@ -695,10 +735,19 @@ def main():
         z = zh_pokemon.get(norm_name(en), {})
         zh_base = z.get("zh") or en
         name_zh = display_species_name(s["constant"], en, zh_base)
+        hidden_set = set(s.get("hiddenAbilities", []))
         abilities = []
+        seen_abilities = set()
         for a in s.get("abilities", []):
+            if a in seen_abilities:
+                continue
+            seen_abilities.add(a)
             az, ad = ability_zh.get(a, ("", ""))
-            abilities.append({"constant": a, "name": az or a.replace("ABILITY_", "").replace("_", " ").title()})
+            abilities.append({
+                "constant": a,
+                "name": az or a.replace("ABILITY_", "").replace("_", " ").title(),
+                "hidden": a in hidden_set and a not in set(s.get("regularAbilities", [])),
+            })
         species.append({
             "slug": s["slug"],
             "dex": s.get("dex"),
@@ -764,23 +813,43 @@ def main():
     abilities.sort(key=lambda x: x["nameEn"])
 
     # ---- items ---------------------------------------------------------
+    # items.json only lists a curated subset; rebuild the full bag from the
+    # source (all ITEM_ constants) and use the ROM for Chinese text.
+    item_meta = parse_item_meta()
+    item_ids = parse_item_ids()
+    docs_items = {it["constant"]: it for it in items_raw}
+    locations_by_id = {
+        it["id"]: [
+            {"map": loc.get("map"), "mapZh": map_name_zh(loc.get("map", "")), "source": source_zh(loc.get("source"))}
+            for loc in it.get("locations", [])
+        ]
+        for it in items_raw
+    }
     items = []
-    for it in items_raw:
-        zh, desc = item_zh_by_id.get(it["id"], (it["name"], ""))
+    for const, meta in item_meta.items():
+        iid = item_ids.get(const)
+        if iid is None or const == "ITEM_NONE":
+            continue
+        if meta["pocket"] == "POCKET_TM_HM" or const.endswith("_E_READER"):
+            continue
+        zh, desc = item_zh_by_id.get(iid, ("", ""))
+        if not zh or zh.strip("?") == "" or "?" in meta["en"]:
+            continue
+        doc = docs_items.get(const)
+        icon = meta.get("icon")
+        en_ascii = unicodedata.normalize("NFKD", meta["en"]).encode("ascii", "ignore").decode("ascii")
+        slug = (doc or {}).get("slug") or re.sub(r"[^a-z0-9]+", "-", en_ascii.lower()).strip("-")
         items.append({
-            "slug": it["slug"],
-            "id": it["id"],
-            "constant": it["constant"],
-            "name": zh or it["name"],
-            "nameEn": it["name"],
+            "slug": slug,
+            "id": iid,
+            "constant": const,
+            "name": zh,
+            "nameEn": meta["en"],
             "description": desc,
-            "pocket": POCKET_ZH.get(it.get("pocket", ""), it.get("pocket", "")),
-            "pocketRaw": it.get("pocket", ""),
-            "icon": it.get("itemIcon"),
-            "locations": [
-                {"map": loc.get("map"), "mapZh": map_name_zh(loc.get("map", "")), "source": source_zh(loc.get("source"))}
-                for loc in it.get("locations", [])
-            ],
+            "pocket": POCKET_ZH.get(meta["pocket"], meta["pocket"]),
+            "pocketRaw": meta["pocket"],
+            "icon": f"sprites/items/{Path(icon).name}" if icon else None,
+            "locations": locations_by_id.get(iid, []),
         })
     items.sort(key=lambda x: x["id"])
 
@@ -906,7 +975,8 @@ def main():
             })
         trainers.append({
             "constant": t.get("constant"),
-            "name": trainer_name.get(t.get("constant"), t.get("displayName") or t.get("name")),
+            "name": trainer_name.get(t.get("constant"))
+            or ("劲敌" if (t.get("displayName") or "").startswith("Silver") else (t.get("displayName") or t.get("name"))),
             "nameEn": t.get("displayName") or t.get("name"),
             "difficulty": DIFFICULTY_ZH.get(t.get("difficulty"), t.get("difficulty")),
             "difficultyRaw": t.get("difficulty"),
@@ -1055,6 +1125,17 @@ def main():
     if not OUT_SPRITES.exists():
         shutil.copytree(SPRITES, OUT_SPRITES)
         print("sprites copied")
+
+    # full item icon set lives in the source tree, not docs/sprites
+    icon_src = SOUL / "graphics/items/icons"
+    icon_dst = OUT_SPRITES / "items"
+    icon_dst.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for f in icon_src.glob("*.png"):
+        if not (icon_dst / f.name).exists():
+            shutil.copy2(f, icon_dst / f.name)
+            copied += 1
+    print(f"item icons added: {copied}")
 
 
 if __name__ == "__main__":
